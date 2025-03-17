@@ -1,54 +1,34 @@
-<h1 style="display: flex; gap: .5rem;">
-  <img src="colorish_64x64.png" width="32" /> Colorish
-</h1>
+# colorish
 
-The official manager for Project Colorway-compatible apps.
+An Electron application with React and TypeScript
 
-<br />
+## Recommended IDE Setup
 
-## Installing
+- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-* Grab the [latest release](https://github.com/ProjectColorway/colorish/releases/latest) from this repo
-* Run Colorish
-* You're set. Any compatible apps will now pass colorway management to Colorish
+## Project Setup
 
-## Supported Apps:
-* Discord (Vencord/Vesktop only for now): DiscordColorways
+### Install
 
-## Building
-## Requirements
-* The latest node.js version
-* pnpm
-### Instructions
-* Clone the repo:
 ```bash
-git clone https://github.com/ProjectColorway/colorish.git
+$ pnpm install
 ```
-* Go inside the `colorish` directory:
+
+### Development
+
 ```bash
-cd colorish
+$ pnpm dev
 ```
-* Install all the packages:
+
+### Build
+
 ```bash
-pnpm i
-```
-* To run in dev mode:
-```bash
-pnpm dev
-```
-* To build full app:
-```bash
-pnpm build
-```
-* To build UI only:
-```bash
-pnpm build:svelte
-```
-* To build electron
-```bash
-pnpm build:electron
-```
-* To build and publish
-```bash
-pnpm build:p
+# For windows
+$ pnpm build:win
+
+# For macOS
+$ pnpm build:mac
+
+# For Linux
+$ pnpm build:linux
 ```
