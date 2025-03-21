@@ -6,10 +6,17 @@ The official manager for Project Colorway-compatible apps.
 
 <br />
 
+## Features
+* Simple and intuitive UI and UX
+* Global Search, to easily find colorways, sources, etc (v2)
+* 3 Color themes (Light, Dark, Black) (v2)
+* Global management of colorways and sources for all compatible apps
+* Supports all Manager Complications (App Summon, Manager Role, Complication Sources)
+* App Store: Install/modify new and existing apps to add colorway support (????????)
+
 ## Installing
 
-* Grab the [latest release](https://github.com/ProjectColorway/colorish/releases/latest) from this repo
-* Run Colorish
+* Grab the [latest release](https://github.com/ProjectColorway/colorish/releases/latest) of Colorish, then run it
 * You're set. Any compatible apps will now pass colorway management to Colorish
 
 ## Supported Apps:
