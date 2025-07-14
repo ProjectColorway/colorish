@@ -8,11 +8,10 @@ The official manager for Project Colorway-compatible apps.
 
 ## Features
 * Simple and intuitive UI and UX
-* Global Search, to easily find colorways, sources, etc (v2)
-* 3 Color themes (Light, Dark, Black) (v2)
+* Global Search, to easily find colorways, sources, etc
+* 3 Color themes (Light, Dark, Black)
 * Global management of colorways and sources for all compatible apps
 * Supports all Manager Complications (App Summon, Manager Role, Complication Sources)
-* App Store: Install/modify new and existing apps to add colorway support (????????)
 
 ## Installing
 
@@ -26,36 +25,41 @@ The official manager for Project Colorway-compatible apps.
 ## Requirements
 * The latest node.js version
 * pnpm
-### Instructions
+
+### Preparation
 * Clone the repo:
 ```bash
-git clone https://github.com/ProjectColorway/colorish.git
+$ git clone https://github.com/ProjectColorway/colorish
 ```
-* Go inside the `colorish` directory:
+* Install all deps
 ```bash
-cd colorish
+$ pnpm i
 ```
-* Install all the packages:
+
+### Development
+
 ```bash
-pnpm i
+$ pnpm dev
 ```
+
+### Build
 * To run in dev mode:
 ```bash
-pnpm dev
+$ pnpm dev
 ```
-* To build full app:
+* To build React:
 ```bash
-pnpm build
+$ pnpm build
 ```
-* To build UI only:
+* To build for any platform:
 ```bash
-pnpm build:svelte
+$ pnpm build:win
+
+$ pnpm build:linux
+
+$ pnpm build:mac
 ```
-* To build electron
+* To publish, create a draft release with the same version as the one specified in `package.json`, then run:
 ```bash
-pnpm build:electron
-```
-* To build and publish
-```bash
-pnpm build:p
+$ pnpm build:publish
 ```
