@@ -1,68 +1,48 @@
 {
-	"appId": "dev.dablulite.colorish",
-	"productName": "Colorish",
-	"directories": {
-		"output": "dist"
-	},
-	"flatpak": {
-		"synopsis": "The official manager for Project Colorway-compatible apps.",
-		"description": "The official manager for Project Colorway-compatible apps. Change, create and manage, all from one place.",
-		"useWaylandFlags": true
-	},
-	"win": {
-		"icon": "build/icon.ico",
-		"publish": ["github"]
-	},
-	"linux": {
-		"vendor": "Project Colorway",
-		"icon": "build/icon.icns",
-		"category": "Utility",
-		"synopsis": "The official manager for Project Colorway-compatible apps.",
-		"description": "The official manager for Project Colorway-compatible apps. Change, create and manage, all from one place.",
-		"desktop": {
-			"Name": "Colorish",
-			"Comment": "The official manager for Project Colorway-compatible apps.",
-			"StartupNotify": false
-		},
-		"maintainer": "DaBluLite",
-		"publish": ["github"],
-		"target": [
-			{
-				"target": "AppImage",
-				"arch": [
-				  	"x64",
-					"arm64"
-				]
-			},
-			{
-				"target": "flatpak",
-				"arch": [
-				  	"x64",
-					"arm64"
-				]
-			},
-			{
-				"target": "rpm",
-				"arch": [
-				  	"x64",
-					"arm64"
-				]
-			},
-			{
-				"target": "deb",
-				"arch": [
-				  	"x64",
-					"arm64"
-				]
-			}
-		]
-	},
-	"files": [
-		"src/electron.cjs",
-		"src/preload.cjs",
-		{
-			"from": "build",
-			"to": ""
-		}
-	]
+    "appId": "dev.dablulite.colorish",
+    "productName": "Colorish",
+    "directories": {
+        "output": "dist"
+    },
+    "flatpak": {
+        "synopsis": "The official manager for Colorways-compatible apps.",
+        "description": "The official manager for Colorways-compatible apps. Change, create and manage, all from one place.",
+        "useWaylandFlags": true
+    },
+    "win": {
+        "icon": "static/icon.ico",
+        "publish": [
+            "github"
+        ]
+    },
+    "linux": {
+        "vendor": "Project Colorway",
+        "icon": "static/icon.icns",
+        "category": "Utility",
+        "synopsis": "The official manager for Project Colorway-compatible apps.",
+        "description": "The official manager for Project Colorway-compatible apps. Change, create and manage, all from one place.",
+        "desktop": {
+            "Name": "Colorish",
+            "Comment": "The official manager for Project Colorway-compatible apps.",
+            "StartupNotify": false
+        },
+        "maintainer": "DaBluLite",
+        "publish": [
+            "github"
+        ],
+        "target": [
+            {
+                "target": "AppImage",
+                "arch": [
+                    "x64"
+                ]
+            },
+            {
+                "target": "flatpak",
+                "arch": [
+                    "x64"
+                ]
+            }
+        ]
+    }
 }

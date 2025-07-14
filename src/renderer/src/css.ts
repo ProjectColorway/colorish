@@ -1,4 +1,4 @@
-import { colorToHex } from "./api/Colors";
+import { colorToHex } from "@api/Colors";
 
 function HexToHSL(H: string) {
     // Convert hex to RGB first
@@ -46,15 +46,16 @@ function HexToHSL(H: string) {
 }
 
 export function getAutoPresets(accentColor?: string) {
+    const hue = HexToHSL("#" + accentColor?.slice(0, 6))[0];
     return {
         hueRotation: {
             name: "Hue Rotation",
             id: "hueRotation",
             colors: {
                 accent: "#" + accentColor,
-                primary: "#" + colorToHex(`hsl(${HexToHSL("#" + accentColor)[0]} 11% 21%)`),
-                secondary: "#" + colorToHex(`hsl(${HexToHSL("#" + accentColor)[0]} 11% 18%)`),
-                tertiary: "#" + colorToHex(`hsl(${HexToHSL("#" + accentColor)[0]} 10% 13%)`)
+                primary: "#" + colorToHex(`hsl(${hue} ${hue !== 0 ? "11%" : "0%"} 21%)`),
+                secondary: "#" + colorToHex(`hsl(${hue} ${hue !== 0 ? "11%" : "0%"} 18%)`),
+                tertiary: "#" + colorToHex(`hsl(${hue} ${hue !== 0 ? "10%" : "0%"} 13%)`)
             }
         },
         accentSwap: {
@@ -81,10 +82,10 @@ export function getAutoPresets(accentColor?: string) {
             name: "Material You",
             id: "materialYou",
             colors: {
-                accent: "#" + colorToHex(`hsl(${HexToHSL("#" + accentColor)[0]} 100% 23%)`),
-                primary: "#" + colorToHex(`hsl(${HexToHSL("#" + accentColor)[0]} 12% 12%)`),
-                secondary: "#" + colorToHex(`hsl(${HexToHSL("#" + accentColor)[0]} 12% 16%)`),
-                tertiary: "#" + colorToHex(`hsl(${HexToHSL("#" + accentColor)[0]} 16% 18%)`)
+                accent: "#" + colorToHex(`hsl(${hue} ${hue !== 0 ? "100%" : "0%"} 23%)`),
+                primary: "#" + colorToHex(`hsl(${hue} ${hue !== 0 ? "12%" : "0%"} 12%)`),
+                secondary: "#" + colorToHex(`hsl(${hue} ${hue !== 0 ? "12%" : "0%"} 16%)`),
+                tertiary: "#" + colorToHex(`hsl(${hue} ${hue !== 0 ? "16%" : "0%"} 18%)`)
             }
         }
     } as { [key: string]: { name: string, id: string, colors: { accent: string, primary: string, secondary: string, tertiary: string; }; }; };

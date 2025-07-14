@@ -1,14 +1,15 @@
-import './style.css';
+import "./style.css";
 
-import React, { Context } from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import { Dispatcher, Styles, Contexts } from './api';
-import { setContext } from './api/Contexts';
-import { simpleContexts } from './api/Hooks';
-import { getAutoPresets } from './css';
-import { ColorwayObject, ContextKey } from './types';
+import React, { Context } from "react";
+import ReactDOM from "react-dom/client";
+
+import { Contexts, Dispatcher, Styles } from "./api";
 import { colorToHex } from "./api/Colors";
+import { setContext } from "./api/Contexts";
+import { simpleContexts } from "./api/Hooks";
+import App from "./App";
+import { getAutoPresets } from "./css";
+import { ColorwayObject, ContextKey } from "./types";
 
 async function setOsColor() {
     if ((window as any).getSystemColor) {
@@ -46,16 +47,17 @@ if ((window as any).onOsColorChanged) {
 }
 
 Contexts.initContexts().then(async context => {
-    document.getElementById('app-root')!.className = "theme-" + context.colorwaysAppTheme;
-    const root = ReactDOM.createRoot(document.getElementById('app-root') as HTMLElement);
-    root.render(
-        <React.StrictMode>
-            <App />
-        </React.StrictMode>
-    );
+    document.getElementById("app-root")!.className = "theme-" + context.colorwaysAppTheme;
+});
 
-    Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", <Key extends ContextKey>(payload) => {
-        const { c, value }: { c: Key, value: Context<Key>; } = payload as any;
-        if (c === "colorwaysAppTheme") document.getElementById("app-root")!.className = "theme-" + value;
-    });
+const root = ReactDOM.createRoot(document.getElementById("app-root") as HTMLElement);
+root.render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
+);
+
+Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", <Key extends ContextKey>(payload) => {
+    const { c, value }: { c: Key, value: Context<Key>; } = payload as any;
+    if (c === "colorwaysAppTheme") document.getElementById("app-root")!.className = "theme-" + value;
 });

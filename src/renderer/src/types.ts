@@ -141,11 +141,19 @@ export interface PresetObject {
 }
 
 export const enum Tabs {
-    Selector,
+    Colorways,
     Settings,
+    History,
     Sources,
-    WsConnection,
-    ExpandSidebar
+    Discover,
+    SettingsHome
+}
+
+export const enum GSTabs {
+    Colorways,
+    History,
+    Sources,
+    Discover
 }
 
 export type ColorValue = typeof colorVals[number]["value"];

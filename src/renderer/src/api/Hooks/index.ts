@@ -1,7 +1,8 @@
-import { Dispatch, SetStateAction, useState, useReducer, useEffect } from "react";
-import { Context, ContextKey } from "../../types";
-import { Dispatcher } from "..";
-import { contexts, setContext } from "../Contexts";
+/* eslint-disable react-compiler/react-compiler */
+import { contexts, setContext } from "@api/Contexts";
+import * as Dispatcher from "@api/Dispatcher";
+import { Context, ContextKey } from "@renderer/types";
+import { Dispatch, SetStateAction, useEffect, useReducer, useState } from "react";
 
 /**
  * Returns a stateful value that points to a context, and a function to update said context.
@@ -12,14 +13,14 @@ import { contexts, setContext } from "../Contexts";
 export function useContextualState<Key extends ContextKey>(context: Key, save = true): [Context<Key>, Dispatch<SetStateAction<Context<Key>>>] {
     const [get, set] = useState<Context<Key>>(contexts[context] as Context<Key>);
     useEffect(() => {
-        Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", (params) => {
+        Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", params => {
             const { c, value } = params as { c: Key, value: Context<Key>; };
             if (context === c) {
                 set(value as Context<Key>);
             }
         });
 
-        return () => Dispatcher.removeListener("COLORWAYS_CONTEXT_UPDATED", (params) => {
+        return () => Dispatcher.removeListener("COLORWAYS_CONTEXT_UPDATED", params => {
             const { c, value } = params as { c: Key, value: Context<Key>; };
             if (context === c) {
                 set(value as Context<Key>);
@@ -69,11 +70,11 @@ export function useContexts(): typeof contexts {
         };
     }, contexts);
     useEffect(() => {
-        Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", (data) => {
+        Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", data => {
             set(data as { c: ContextKey, value: Context<ContextKey>; });
         });
 
-        return () => Dispatcher.removeListener("COLORWAYS_CONTEXT_UPDATED", (data) => {
+        return () => Dispatcher.removeListener("COLORWAYS_CONTEXT_UPDATED", data => {
             set(data as { c: ContextKey, value: Context<ContextKey>; });
         });
     }, []);
@@ -97,7 +98,7 @@ export function simpleContext<Key extends ContextKey>(context: Key, save = true)
             }
         }
     }
-    Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", (params) => callEvts(params as { c: Key, value: Context<Key>; }));
+    Dispatcher.addListener("COLORWAYS_CONTEXT_UPDATED", params => callEvts(params as { c: Key, value: Context<Key>; }));
 
     type Events = {
         [key in ContextKey]: (<Key extends ContextKey>(context: Key, value: Context<Key>) => void)[]
@@ -107,7 +108,7 @@ export function simpleContext<Key extends ContextKey>(context: Key, save = true)
         () => val,
         set,
         () => {
-            Dispatcher.removeListener("COLORWAYS_CONTEXT_UPDATED", (params) => callEvts(params as { c: Key, value: Context<Key>; }));
+            Dispatcher.removeListener("COLORWAYS_CONTEXT_UPDATED", params => callEvts(params as { c: Key, value: Context<Key>; }));
             events = {};
         },
         (context: ContextKey, callback: <Key extends ContextKey>(context: Key, value: Context<Key>) => void) => {

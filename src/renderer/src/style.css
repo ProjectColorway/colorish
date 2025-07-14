@@ -60,6 +60,8 @@
     --custom-modal-min-width-large: 800px;
     --animate-notification: notification 0.3s ease;
     --animate-modal: show-modal 0.4s ease;
+    --animate-gs-modal: show-gs-modal 0.4s ease;
+    --font-logo: "Edu AU VIC WA NT Hand";
 }
 
 .dc-win-button {
@@ -230,17 +232,28 @@
 
 @keyframes show-modal {
     0% {
-        transform: scale(0.7);
-        opacity: 0;
+        transform: translateY(100%);
     }
 
     75% {
-        transform: scale(1.009);
-        opacity: 1;
+        transform: translateY(0);
     }
 
     100% {
-        transform: scale(1);
+        transform: translateY(4px);
+    }
+}
+
+@keyframes show-gs-modal {
+    0% {
+        width: 82px;
+        height: 46px;
+        opacity: 0;
+    }
+
+    100% {
+        width: 428px;
+        height: 64px;
         opacity: 1;
     }
 }
@@ -299,7 +312,7 @@
 }
 
 .dc-button {
-    @apply select-none outline-none [.dc-button-outlined]:border [.dc-button-outlined]:border-transparent rounded-lg bg-transparent px-3 py-1 w-auto box-border items-center justify-center gap-2 flex cursor-pointer transition hover:bg-white/5 active:bg-white/1 min-w-[var(--custom-button-button-sm-width)] min-h-[var(--custom-button-button-sm-height)] h-[var(--custom-button-button-sm-height)] [.dc-button-md]:min-w-[var(--custom-button-button-md-width)] [.dc-button-md]:min-h-[var(--custom-button-button-md-height)] [.dc-button-md]:h-[var(--custom-button-button-md-height)] [.dc-button-lg]:min-w-[var(--custom-button-button-lg-width)] [.dc-button-lg]:min-h-[var(--custom-button-button-lg-height)] [.dc-button-lg]:h-[var(--custom-button-button-lg-height)] [.dc-button-xl]:min-w-[var(--custom-button-button-xl-width)] [.dc-button-xl]:min-h-[var(--custom-button-button-xl-height)] [.dc-button-xl]:h-[var(--custom-button-button-xl-height)] [.dc-button-tn]:min-w-[var(--custom-button-button-tn-width)] [.dc-button-tn]:min-h-[var(--custom-button-button-tn-height)] [.dc-button-tn]:h-[var(--custom-button-button-tn-height)] [.dc-button-icon]:px-1 [.dc-button-icon]:min-w-[var(--custom-button-button-sm-height)] [.dc-button-icon.dc-button-md]:min-w-[var(--custom-button-button-md-height)] [.dc-button-icon.dc-button-lg]:min-w-[var(--custom-button-button-lg-height)] [.dc-button-icon.dc-button-xl]:min-w-[var(--custom-button-button-xl-height)] [.dc-button-icon.dc-button-tn]:min-w-[var(--custom-button-button-tn-height)]
+    @apply select-none outline-none [.dc-button-outlined]:border [.dc-button-outlined]:border-transparent rounded-xl bg-transparent px-3 py-1 w-auto box-border items-center justify-center gap-2 flex cursor-pointer transition hover:bg-white/5 active:bg-white/1 min-w-[var(--custom-button-button-sm-width)] min-h-[var(--custom-button-button-sm-height)] h-[var(--custom-button-button-sm-height)] [.dc-button-md]:min-w-[var(--custom-button-button-md-width)] [.dc-button-md]:min-h-[var(--custom-button-button-md-height)] [.dc-button-md]:h-[var(--custom-button-button-md-height)] [.dc-button-lg]:min-w-[var(--custom-button-button-lg-width)] [.dc-button-lg]:min-h-[var(--custom-button-button-lg-height)] [.dc-button-lg]:h-[var(--custom-button-button-lg-height)] [.dc-button-xl]:min-w-[var(--custom-button-button-xl-width)] [.dc-button-xl]:min-h-[var(--custom-button-button-xl-height)] [.dc-button-xl]:h-[var(--custom-button-button-xl-height)] [.dc-button-tn]:min-w-[var(--custom-button-button-tn-width)] [.dc-button-tn]:min-h-[var(--custom-button-button-tn-height)] [.dc-button-tn]:h-[var(--custom-button-button-tn-height)] [.dc-button-icon]:px-1 [.dc-button-icon]:min-w-[var(--custom-button-button-sm-height)] [.dc-button-icon.dc-button-md]:min-w-[var(--custom-button-button-md-height)] [.dc-button-icon.dc-button-lg]:min-w-[var(--custom-button-button-lg-height)] [.dc-button-icon.dc-button-xl]:min-w-[var(--custom-button-button-xl-height)] [.dc-button-icon.dc-button-tn]:min-w-[var(--custom-button-button-tn-height)]
 }
 
 .dc-button.dc-button-primary {
@@ -311,7 +324,7 @@
 }
 
 .dc-button.dc-button-danger {
-    @apply bg-[#e80808] text-black dark:text-white not-[.dc-button-outlined]:text-white [.dc-button-outlined]:border-[#e80808] hover:bg-[#c70707] hover:border-[#c70707] active:bg-[#b10606] active:border-[#b10606] hover:text-white active:text-white
+    @apply bg-red-600/75 text-black dark:text-white [.dc-button-outlined]:border-red-600/75 hover:bg-red-700/75 hover:border-red-700/75 active:bg-red-800/75 active:border-red-800/75
 }
 
 .dc-button.dc-button-brand {
@@ -470,8 +483,16 @@
     animation-delay: 0.23s;
 }
 
+@utility colorway-pure {
+    @apply box-border min-h-[56px] border border-transparent flex transition rounded-sm px-4 py-2 justify-start gap-2 cursor-pointer bg-primary-100 text-primary-800 dark:bg-primary-600 black:bg-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-700 items-center [[aria-checked="true"]]:bg-primary-200 dark:[[aria-checked="true"]]:bg-primary-800;
+}
+
+@utility colorway-danger {
+    @apply bg-red-600/50 hover:bg-red-700/50 active:bg-red-800/50;
+}
+
 .dc-colorway {
-    @apply box-border min-h-[56px] border border-transparent flex transition rounded-sm px-4 py-2 justify-start gap-2 cursor-pointer bg-primary-100 text-primary-800 dark:bg-primary-600 black:bg-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-700 items-center [[aria-checked="true"]]:bg-primary-200 dark:[[aria-checked="true"]]:bg-primary-800 last:odd:w-[calc(200%+0.125rem)] last:odd:rounded-b-2xl last:even:rounded-br-2xl odd:nth-last-[2]:rounded-bl-2xl first:last:rounded-2xl first:rounded-tl-2xl nth-[2]:rounded-tr-2xl first:nth-last-[2]:rounded-l-2xl last:nth-[2]:rounded-r-2xl
+    @apply colorway-pure last:odd:w-[calc(200%+0.125rem)] last:odd:rounded-b-2xl last:even:rounded-br-2xl odd:nth-last-[2]:rounded-bl-2xl first:last:rounded-2xl first:rounded-tl-2xl nth-[2]:rounded-tr-2xl first:nth-last-[2]:rounded-l-2xl last:nth-[2]:rounded-r-2xl;
 }
 
 @keyframes loading-bar {
@@ -564,10 +585,10 @@
     margin-right: auto;
     margin-top: 0 !important;
     margin-left: 0.5rem;
-    color: var(--header-primary);
     font-family: bootstrap-icons, var(--font-primary);
     /* stylelint-disable-next-line value-keyword-case */
     text-rendering: optimizeLegibility;
+    @apply text-black dark:text-white
 }
 
 .dc-subnote {
@@ -595,7 +616,7 @@
 }
 
 .dc-modal {
-    @apply animate-modal min-w-[400px] relative min-h-0 pointer-events-auto bg-white dark:bg-primary-500 black:bg-black shadow-2xl shadow-primary-800 transition m-0 p-0 text-black dark:text-white w-screen md:w-fit h-screen md:h-fit md:rounded-lg border-none md:border-solid md:border-1 flex flex-col md:border-primary-200 md:dark:border-primary-400
+    @apply animate-modal min-w-[400px] pb-[4px] transform-[translateY(4px)] relative min-h-0 pointer-events-auto bg-white dark:bg-primary-500 black:bg-black shadow-2xl shadow-primary-800 transition m-0 p-0 text-black dark:text-white w-screen h-fit rounded-t-2xl border-none md:border-solid md:border-1 flex flex-col md:border-primary-200 md:dark:border-primary-400
 }
 
 .dc-modal-content {
@@ -912,12 +933,7 @@
 }
 
 .colorwaysSaveAsSwatch {
-    width: 47.5px;
-    height: 47.5px;
-    border: none;
-    position: relative;
-    border-radius: 0;
-    cursor: pointer;
+    @apply w-full h-[48px] flex items-center justify-center rounded-xl border border-primary-400/20 cursor-pointer relative
 }
 
 .colorwayCustomColorpicker {

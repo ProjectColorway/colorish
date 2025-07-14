@@ -1,15 +1,9 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2024 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { useState } from "react";
 import { DataStore } from "../../api";
 import { defaultColorwaySource } from "../../constants";
-import Modal from "../Modal";
+import Modal from "../Modals/Modal";
 import Setting from "../Setting";
-import Switch from "../Switch";
+import { Switch } from "../Input";
 
 export default function ({ modalProps, onOnline = () => { }, onOffline, offlineOnly = false, name = "" }: { modalProps: { onClose(): void; }, onOnline?(props: { name: string, url: string; }): any, onOffline(props: { name: string; }): any, offlineOnly?: boolean, name?: string; }) {
     const [colorwaySourceName, setColorwaySourceName] = useState<string>(name);

@@ -1,9 +1,3 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2024 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 import { IconProps } from "./Icons";
 
 export default function ({ items, ...props }: { items: { Icon: (props: IconProps) => React.JSX.Element, title: string; }[]; } & React.HTMLAttributes<HTMLDivElement>) {

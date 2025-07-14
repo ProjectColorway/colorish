@@ -2,7 +2,7 @@ import { Modals } from "@renderer/api";
 import { useContextualState } from "../../api/Hooks";
 import changelog from "../../changelog";
 import { DiscordIcon } from "../Icons";
-import Modal from "../Modal";
+import Modal from "../Modals/Modal";
 
 
 function YoutubeEmbed({ src }) {
@@ -61,4 +61,4 @@ function ChangelogModal({
     </Modal>;
 }
 
-export default () => Modals.openModal(props => <ChangelogModal modalProps={props} title="What's new" image="https://github.com/DaBluLite/DiscordColorways/blob/master/banner.png?raw=true" {...changelog} />);
+export default () => Modals.openModal(props => <ChangelogModal modalProps={props} title="What's new" image="https://www.dablulite.dev/_next/image?url=%2Fproject-colorway-banner.jpg&w=1080&q=50" {...changelog} />);

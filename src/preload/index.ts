@@ -1,7 +1,8 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, shell } from "electron";
+import { WebSocketServer } from "ws";
+
 import { get, set } from "./DataStore";
 import { ColorwayObject, WsClient } from "./types";
-import { WebSocketServer } from "ws";
 
 function isSameBoundKey(boundKey1, boundKey2) {
     return (Object.keys(boundKey1)[0] === Object.keys(boundKey2)[0]) && Object.values(boundKey1)[0] === Object.values(boundKey2)[0];
@@ -13,7 +14,7 @@ contextBridge.exposeInMainWorld("setMainCSS", (id, css) => {
     ipcRenderer.invoke("DcSetCss", id, css);
 });
 
-contextBridge.exposeInMainWorld("removeMainCSS", (id) => {
+contextBridge.exposeInMainWorld("removeMainCSS", id => {
     ipcRenderer.invoke("DcRemoveCss", id);
 });
 
@@ -23,13 +24,18 @@ contextBridge.exposeInMainWorld("electron_api", {
     getCurrentWindow: () => ipcRenderer.invoke("DcGetCurrentWindow")
 });
 
-contextBridge.exposeInMainWorld("onOsColorChanged", (callback) => {
+contextBridge.exposeInMainWorld("onOsColorChanged", callback => {
     ipcRenderer.addListener("DcAccentColorChanged", callback);
 });
 
 ipcRenderer.addListener("bound-clients-updated", (_, wscl) => {
     wsClients = wscl;
 });
+
+contextBridge.exposeInMainWorld("authorizeApp", () => {
+    ipcRenderer.invoke("begin-auth");
+});
+
 
 let MID: any;
 get("UUID").then(UUID => {
@@ -66,7 +72,25 @@ contextBridge.exposeInMainWorld("dc_win", {
     },
     changeManagerRoleState(boundKey: { [x: number]: string; }, enabled: boolean) {
         (wsClients.find(ws => isSameBoundKey(JSON.parse(ws.boundKey), boundKey)) as WsClient).isManager = enabled;
+    },
+    openExternal(url: string) {
+        shell.openExternal(url);
     }
+});
+
+ipcRenderer.addListener("request-auth-status", () => {
+    get("authedUser").then((user: { username: string | null, image: string | null; } | null) => {
+        if (!user || !user.username) ipcRenderer.invoke("auth-status-received", false);
+        else ipcRenderer.invoke("auth-status-received", true);
+    });
+});
+
+ipcRenderer.addListener("authData", (_, user: { username: string, image: string; }) => {
+    window.postMessage({
+        type: "authed-user",
+        user
+    });
+
 });
 
 wsManager.on("connection", function connection(wss: WsClient) {
@@ -112,7 +136,7 @@ wsManager.on("connection", function connection(wss: WsClient) {
                 case "complication:manager-role:send-colorway":
                     if (ws.isManager) {
                         set("activeColorwayObject", data.active);
-                        wsClients.forEach((w) => w.dispatch("change-colorway", { active: data.active }));
+                        wsClients.forEach(w => w.dispatch("change-colorway", { active: data.active }));
                         window.postMessage({
                             type: "complication:manager-role:receive-colorway",
                             active: data.active

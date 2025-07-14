@@ -13,6 +13,15 @@
     "paths": {
       "@renderer/*": [
         "src/renderer/src/*"
+      ],
+      "@api/*": [
+        "src/renderer/src/api/*"
+      ],
+      "@components/*": [
+        "src/renderer/src/components/*"
+      ],
+      "@api": [
+        "src/rendered/src/api"
       ]
     }
   }

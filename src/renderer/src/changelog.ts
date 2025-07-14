@@ -1,9 +1,3 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2024 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 const changelog: {
     description: string, changes: {
         title: string,
@@ -11,13 +5,21 @@ const changelog: {
         items: string[];
     }[];
 } = {
-    description: "DiscordColorways is rapidly growing into a very complex app that has a lot of things to take care of. This update will keep things running smoothly.",
+    description: "Beta 2 is here! These are all the changes:",
     changes: [
         {
-            title: "Added",
-            type: "added",
+            title: "A new UI",
+            type: "improved",
             items: [
-                "You can now use BetterDiscord compatible themes from DiscordColorways. This will come useful for Colorway Themes"
+                "Switched to a sidebar navigation model, with more segments",
+                "Improved UI consistency"
+            ]
+        },
+        {
+            title: "Global Search Improvements",
+            type: "improved",
+            items: [
+                "New GS expanded pages, that show more actions. Currently shown for sources, subject to change"
             ]
         }
     ]

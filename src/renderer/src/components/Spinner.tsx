@@ -1,9 +1,3 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2023 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 export default function ({ className = "", style }: { className?: string, style?: React.CSSProperties; }) {
     return <div className={`dc-spinner ${className}`} role="img" aria-label="Loading" style={style}>
         <div className="dc-spinner-inner">

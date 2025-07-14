@@ -1,21 +1,13 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2024 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
+import { JSX } from "react";
 
 import { Tabs } from "../types";
 import { IconProps } from "./Icons";
 
-export default function ({ id, title, Icon, bottom, onSelect, activeTab, expanded = false, onContextMenu = () => { }, onMouseEnter = () => { }, onMouseLeave = () => { } }: { id: Tabs, title?: string, Icon: (props: React.PropsWithChildren<IconProps>) => JSX.Element, bottom?: boolean, onSelect: (id: Tabs, e: React.MouseEvent<HTMLDivElement>) => void, activeTab: Tabs, expanded?: boolean, onContextMenu?: React.MouseEventHandler<HTMLDivElement>, onMouseEnter?: React.MouseEventHandler<HTMLDivElement>, onMouseLeave?: React.MouseEventHandler<HTMLDivElement>; }) {
+export default function ({ id, title, Icon, onSelect, activeTab, onContextMenu = () => { }, onMouseEnter = () => { }, onMouseLeave = () => { } }: { id: Tabs, title?: string, Icon: (props: React.PropsWithChildren<IconProps>) => JSX.Element, onSelect: (id: Tabs, e: React.MouseEvent<HTMLDivElement>) => void, activeTab: Tabs, onContextMenu?: React.MouseEventHandler<HTMLDivElement>, onMouseEnter?: React.MouseEventHandler<HTMLDivElement>, onMouseLeave?: React.MouseEventHandler<HTMLDivElement>; }) {
     return <div
-        className={`region-no-drag flex shrink-0 gap-2 relative z-10 h-full place-content-center px-6 transition duration-100 items-center focus:outline-none text-primary-300 cursor-pointer select-none dark:text-primary-300 ${(id === activeTab ? " text-primary-800 dark:text-white" : "")}`}
+        className={`region-no-drag rounded-lg px-3 py-1.5 min-w-(--custom-button-button-sm-width) min-h-(--custom-button-button-sm-height) w-full flex shrink-0 gap-2 relative z-10 justify-start transition-all duration-200 ease items-center focus:outline-none cursor-pointer select-none hover:bg-primary-200 hover:dark:bg-primary-700 text-primary-800 dark:text-white${(id === activeTab ? " !bg-primary-100 dark:!bg-primary-600 black:!bg-primary-800 shadow-glass" : "")}`}
         onClick={e => {
             onSelect(id, e);
-        }}
-        style={{
-            ...(bottom ? { marginTop: "auto" } : {}),
-            ...(expanded ? { justifyContent: "start" } : {}),
         }}
         onContextMenu={onContextMenu}
         onMouseEnter={onMouseEnter}

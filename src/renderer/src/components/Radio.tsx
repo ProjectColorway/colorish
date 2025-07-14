@@ -1,9 +1,3 @@
-/*
- * Vencord, a Discord client mod
- * Copyright (c) 2024 Vendicated and contributors
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 export default function ({ checked = false, style = {} }: { checked: boolean, style?: React.CSSProperties; }) {
     return <>
         <svg className="dc-radio" aria-hidden="true" role="img" width="18" height="18" viewBox="0 0 24 24" style={style}>

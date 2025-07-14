@@ -1,68 +1,81 @@
-import { app, shell, BrowserWindow, ipcMain, systemPreferences } from 'electron';
-import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import icon from '../../resources/icon.png?asset';
-import { IpcEvents } from './IpcEvents';
-import fs from 'node:fs';
-import mime from 'mime-types';
-import { Contexts } from "./api";
+import fs from "node:fs";
 
-let mainWindow: BrowserWindow | null;
+import { electronApp, is, optimizer } from "@electron-toolkit/utils";
+import { app, BrowserWindow, ipcMain, shell, systemPreferences } from "electron";
+import mime from "mime-types";
+import { join } from "path";
+
+import icon from "../../resources/icon.png?asset";
+import { Contexts } from "./api";
+import AuthClient from "./api/Services/auth";
+import { IpcEvents } from "./IpcEvents";
+
+let mainWindow: BrowserWindow;
+const authClient = new AuthClient();
 
 function createWindow(): void {
-    // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1040,
+        width: 460,
+        maxWidth: 460,
         height: 800,
-        frame: false,
-        backgroundColor: '#313338',
-        ...(process.platform === 'linux' ? { icon } : {}),
+        titleBarStyle: "hidden",
+        title: "Colorish",
+        resizable: false,
+        backgroundColor: "#313338",
+        ...(process.platform === "linux" ? { icon } : {}),
         webPreferences: {
-            preload: join(__dirname, '../preload/index.js'),
+            preload: join(__dirname, "../preload/index.js"),
             sandbox: false
         }
     });
 
-    mainWindow.on('ready-to-show', () => {
+    mainWindow.on("ready-to-show", () => {
         mainWindow?.show();
     });
 
-    mainWindow.webContents.setWindowOpenHandler((details) => {
+    mainWindow.webContents.setWindowOpenHandler(details => {
         shell.openExternal(details.url);
-        return { action: 'deny' };
+        return { action: "deny" };
     });
 
-    // HMR for renderer base on electron-vite cli.
-    // Load the remote URL for development or the local html file for production.
-    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-        mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
+    if (is.dev && process.env.ELECTRON_RENDERER_URL) {
+        mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
     } else {
-        mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+        mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
     }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-    // Set app user model id for windows
-    electronApp.setAppUserModelId('com.electron');
+ipcMain.handle("begin-auth", () => {
+    authClient.authenticate();
+});
 
-    // Default open or close DevTools by F12 in development
-    // and ignore CommandOrControl + R in production.
-    // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-    app.on('browser-window-created', (_, window) => {
+/**
+ * Emits an event to the ipcRenderer, with the authorization result
+ * @param status Discord authorization result
+ */
+export const setAuthResult = (status: { username: string, image: string; }) => {
+    mainWindow.webContents.send(
+        "authData", status
+    );
+
+    mainWindow.show();
+    mainWindow.focus();
+
+    authClient.stopListening();
+};
+
+app.whenReady().then(() => {
+    electronApp.setAppUserModelId("com.electron");
+
+    app.on("browser-window-created", (_, window) => {
         optimizer.watchWindowShortcuts(window);
     });
-
-    // IPC test
-    ipcMain.on('ping', () => console.log('pong'));
 
     createWindow();
 
     Contexts.initContexts();
 
-    app.on('activate', function () {
+    app.on("activate", function () {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -72,9 +85,8 @@ app.whenReady().then(() => {
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-    mainWindow = null;
-    if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
         app.quit();
     }
 });
@@ -84,7 +96,7 @@ app.on('window-all-closed', () => {
 
 ipcMain.handle("get-colorish-ui", (_, path) => {
     try {
-        const data = fs.readFileSync(join(__dirname, '../renderer', path), 'utf8');
+        const data = fs.readFileSync(join(__dirname, "../renderer", path), "utf8");
         return { html: data, mime: mime.lookup(path) };
     } catch (e) {
         return { html: `<html><head><title>Internal Server Error</title></head><body><h1>Internal Server Error</h1><h3>${e}</h1></body></html>`, mime: "text/html" };
@@ -96,19 +108,19 @@ ipcMain.handle(IpcEvents.OPEN_WINDOW, (_, html) => {
         width: 1040,
         height: 800,
         frame: false,
-        backgroundColor: '#313338',
-        ...(process.platform === 'linux' ? { icon } : {}),
+        backgroundColor: "#313338",
+        ...(process.platform === "linux" ? { icon } : {}),
         webPreferences: {
-            preload: join(__dirname, '../preload/index.js'),
+            preload: join(__dirname, "../preload/index.js"),
             sandbox: false
         }
     });
 
-    win.on('ready-to-show', () => {
+    win.on("ready-to-show", () => {
         win?.show();
     });
 
-    win.loadURL('data:text/html;charset=UTF-8,' + encodeURIComponent(html), {
+    win.loadURL("data:text/html;charset=UTF-8," + encodeURIComponent(html), {
         baseURLForDataURL: `file://${join(__dirname, "../renderer")}`
     });
 });

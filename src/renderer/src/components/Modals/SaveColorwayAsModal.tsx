@@ -1,13 +1,16 @@
-import { HexColorPicker } from "react-colorful";
+import { colorToHex, hexToString } from "@renderer/api/Colors";
+import { setContext } from "@renderer/api/Contexts";
 import { useEffect, useReducer, useState } from "react";
+import { HexColorPicker } from "react-colorful";
+
 import { useContextualState } from "../../api/Hooks";
 import { openModal } from "../../api/Modals";
 import { Colorway, ColorwayObject } from "../../types";
+import { StaticContextMenu } from "../ContextMenu";
 import { PlusIcon } from "../Icons";
-import Modal from "../Modal";
+import Modal from "../Modals/Modal";
+import AuthenticationRequiredModal from "./AuthenticationRequiredModal";
 import NewStoreModal from "./NewStoreModal";
-import { colorToHex, hexToString } from "@renderer/api/Colors";
-import StaticOptionsMenu from "../StaticOptionsMenu";
 export default function ({
     modalProps,
     colorwayID: colorID,
@@ -60,6 +63,7 @@ export default function ({
     const [secondary, setSecondary] = useState("#2b2d31");
     const [tertiary, setTertiary] = useState("#1e1f22");
     const [offlineColorwayStores, setOfflineColorwayStores] = useContextualState("customColorways");
+    const [authedUser] = useContextualState("authedUser");
     const [colorwayName, setColorwayName] = useState<string>(colorwayObject ? (colorwayObject.id as string) : "");
     const [noStoreError, setNoStoreError] = useState<boolean>(false);
     const [duplicateError, setDuplicateError] = useState<boolean>(false);
@@ -91,112 +95,84 @@ export default function ({
         }
     });
 
-    return <Modal
-        modalProps={modalProps}
-        title={(() => {
-            if (colorwayID) return "Save Temporary";
-            if (colorwayObject && !store) return "Save";
-            if (colorwayObject && store) return "Edit";
-            return "Create";
-        })() + " Colorway"}
-        onFinish={async ({ closeModal }) => {
-            setNoStoreError(false);
-            setDuplicateError(false);
-            if (!storename && !store) {
-                return setNoStoreError(true);
-            }
-            const customColorway: Colorway = {
-                name: (colorwayName || "Colorway"),
-                accent: "#" + colors.accent,
-                primary: "#" + colors.primary,
-                secondary: "#" + colors.secondary,
-                tertiary: "#" + colors.tertiary,
-                author: "any",
-                authorID: "any"
-            };
-            if (((offlineColorwayStores.find(s => s.name === storename)!.colorways || []).find(colorway => colorway.name === customColorway.name)) && !store) {
-                return setDuplicateError(true);
-            } else {
-                setOfflineColorwayStores(stores => stores.map(s => {
-                    if (s.name === storename) {
-                        return { name: s.name, colorways: [...(s.colorways || []).filter(c => c.name !== (colorwayObject || { id: "" }).id), customColorway], presets: s.presets || [] };
-                    }
-                    return s;
-                }));
-            }
-            closeModal();
-        }}
-        additionalButtons={[
-            {
-                text: "Enter Colorway ID",
-                type: "primary",
-                action: () => openModal((props: any) => <Modal
-                    modalProps={props}
-                    onFinish={({ closeModal }) => {
-                        setColorwayIDError("");
-                        if (!colorwayID) {
-                            return setColorwayIDError("Please enter a Colorway ID");
-                        } else if (!hexToString(colorwayID).includes(",")) {
-                            return setColorwayIDError("Invalid Colorway ID");
-                        } else {
-                            hexToString(colorwayID).split(/,#/).forEach((color: string, i: number) => updateColors({ task: setColor[i], color: colorToHex(color) }));
-                            setColorwayIDError("");
-                            closeModal();
+    if (authedUser && authedUser.username) {
+        return <Modal
+            modalProps={modalProps}
+            title={(() => {
+                if (colorwayID) return "Save Temporary";
+                if (colorwayObject && !store) return "Save";
+                if (colorwayObject && store) return "Edit";
+                return "Create";
+            })() + " Colorway"}
+            onFinish={async ({ closeModal }) => {
+                setNoStoreError(false);
+                setDuplicateError(false);
+                if (!storename && !store) {
+                    return setNoStoreError(true);
+                }
+                const customColorway: Colorway = {
+                    name: (colorwayName || "Colorway"),
+                    accent: "#" + colors.accent,
+                    primary: "#" + colors.primary,
+                    secondary: "#" + colors.secondary,
+                    tertiary: "#" + colors.tertiary,
+                    author: authedUser.username as string
+                };
+                if (((offlineColorwayStores.find(s => s.name === storename)!.colorways || []).find(colorway => colorway.name === customColorway.name)) && !store) {
+                    return setDuplicateError(true);
+                } else {
+                    setContext("customColorways", offlineColorwayStores.map(s => {
+                        if (s.name === storename) {
+                            return { name: s.name, colorways: [...(s.colorways || []).filter(c => c.name !== (colorwayObject || { id: "" }).id), customColorway], presets: s.presets || [] };
                         }
-                    }}
-                    title="Enter Colorway ID"
-                >
-                    <span className={`dc-field-header${colorwayIDError ? " dc-field-header-error" : ""}`} style={{ marginBottom: "4px" }}>Colorway ID{colorwayIDError ? <span className="dc-field-header-errormsg">
-                        <span className="dc-field-header-errordiv">-</span>
-                        {colorwayIDError}
-                    </span> : null}</span>
-                    <input
-                        type="text"
-                        className="dc-textbox"
-                        placeholder="Enter Colorway ID"
-                        onInput={({ currentTarget: { value } }) => setColorwayID(value)}
-                    />
-                </Modal>)
-            }
-        ]}
-    >
-        <div style={{ display: "flex", gap: "20px" }}>
-            <div className="dc-color-swatch" style={{ width: "100px", height: "100px" }}>
-                <StaticOptionsMenu menu={<div className="flex flex-col p-1 gap-1.5">
-                    <HexColorPicker className="rounded-sm" color={accent} onChange={setAccent} />
-                    <input type="text" onChange={(e) => setAccent(e.currentTarget.value)} value={accent} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
-                </div>}>
-                    {({ onClick }) => {
-                        return <div onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: accent }} />;
-                    }}
-                </StaticOptionsMenu>
-                <StaticOptionsMenu menu={<div className="flex flex-col p-1 gap-1.5">
-                    <HexColorPicker className="rounded-sm" color={primary} onChange={setPrimary} />
-                    <input type="text" onChange={(e) => setPrimary(e.currentTarget.value)} value={primary} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
-                </div>}>
-                    {({ onClick }) => {
-                        return <div onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: primary }} />;
-                    }}
-                </StaticOptionsMenu>
-                <StaticOptionsMenu menu={<div className="flex flex-col p-1 gap-1.5">
-                    <HexColorPicker className="rounded-sm" color={secondary} onChange={setSecondary} />
-                    <input type="text" onChange={(e) => setSecondary(e.currentTarget.value)} value={secondary} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
-                </div>}>
-                    {({ onClick }) => {
-                        return <div onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: secondary }} />;
-                    }}
-                </StaticOptionsMenu>
-                <StaticOptionsMenu menu={<div className="flex flex-col p-1 gap-1.5">
-                    <HexColorPicker className="rounded-sm" color={tertiary} onChange={setTertiary} />
-                    <input type="text" onChange={(e) => setTertiary(e.currentTarget.value)} value={tertiary} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
-                </div>}>
-                    {({ onClick }) => {
-                        return <div onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: tertiary }} />;
-                    }}
-                </StaticOptionsMenu>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", width: "100%" }}>
-                <span style={{ marginTop: "8px" }} className={`dc-field-header${duplicateError ? " dc-field-header-error" : ""}`}>Name{duplicateError ? <span className="dc-field-header-errormsg">
+                        return s;
+                    }));
+                }
+                closeModal();
+            }}
+            additionalButtons={[
+                {
+                    text: "Enter Colorway ID",
+                    type: "primary",
+                    action: () => openModal((props: any) => <Modal
+                        modalProps={props}
+                        onFinish={({ closeModal }) => {
+                            setColorwayIDError("");
+                            if (!colorwayID) {
+                                return setColorwayIDError("Please enter a Colorway ID");
+                            } else if (!hexToString(colorwayID).includes(",")) {
+                                return setColorwayIDError("Invalid Colorway ID");
+                            } else {
+                                hexToString(colorwayID).split(/,#/).forEach((color: string, i: number) => updateColors({ task: setColor[i], color: colorToHex(color) }));
+                                setColorwayIDError("");
+                                closeModal();
+                            }
+                        }}
+                        title="Enter Colorway ID"
+                    >
+                        <span className={`dc-field-header${colorwayIDError ? " dc-field-header-error" : ""}`} style={{ marginBottom: "4px" }}>Colorway ID{colorwayIDError ? <span className="dc-field-header-errormsg">
+                            <span className="dc-field-header-errordiv">-</span>
+                            {colorwayIDError}
+                        </span> : null}</span>
+                        <input
+                            type="text"
+                            className="dc-textbox"
+                            placeholder="Enter Colorway ID"
+                            onInput={({ currentTarget: { value } }) => setColorwayID(value)}
+                        />
+                    </Modal>)
+                }
+            ]}
+        >
+            <div className="flex flex-col gap-1 w-full -mt-4">
+                {!store && (!colorwayObject || !colorwayID) && <>
+                    <span className="dc-field-header">Signed in as</span>
+                    <div className="flex items-center gap-2 w-fit">
+                        <img src={authedUser.image as string} width={32} height={32} className="rounded-full" />
+                        {authedUser.username}
+                    </div>
+                </>}
+                <span className={`dc-field-header${duplicateError ? " dc-field-header-error" : ""}`}>Name{duplicateError ? <span className="dc-field-header-errormsg">
                     <span className="dc-field-header-errordiv">-</span>
                     A colorway with this name already exists
                 </span> : <></>}</span>
@@ -208,6 +184,41 @@ export default function ({
                     autoFocus
                     onInput={e => setColorwayName(e.currentTarget.value)}
                 />
+                <span className="dc-field-header">Colors</span>
+                <div className="flex gap-1 items-center justify-stretch">
+                    <StaticContextMenu yPos="top" menu={<div className="flex flex-col p-1 gap-1.5">
+                        <HexColorPicker className="rounded-sm" color={accent} onChange={setAccent} />
+                        <input type="text" onChange={e => setAccent(e.currentTarget.value)} value={accent} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
+                    </div>}>
+                        {({ onClick, containerRef }) => {
+                            return <div ref={containerRef} onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: accent }}>Accent</div>;
+                        }}
+                    </StaticContextMenu>
+                    <StaticContextMenu yPos="top" menu={<div className="flex flex-col p-1 gap-1.5">
+                        <HexColorPicker className="rounded-sm" color={primary} onChange={setPrimary} />
+                        <input type="text" onChange={e => setPrimary(e.currentTarget.value)} value={primary} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
+                    </div>}>
+                        {({ onClick, containerRef }) => {
+                            return <div ref={containerRef} onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: primary }}>Primary</div>;
+                        }}
+                    </StaticContextMenu>
+                    <StaticContextMenu yPos="top" menu={<div className="flex flex-col p-1 gap-1.5">
+                        <HexColorPicker className="rounded-sm" color={secondary} onChange={setSecondary} />
+                        <input type="text" onChange={e => setSecondary(e.currentTarget.value)} value={secondary} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
+                    </div>}>
+                        {({ onClick, containerRef }) => {
+                            return <div ref={containerRef} onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: secondary }}>Secondary</div>;
+                        }}
+                    </StaticContextMenu>
+                    <StaticContextMenu yPos="top" menu={<div className="flex flex-col p-1 gap-1.5">
+                        <HexColorPicker className="rounded-sm" color={tertiary} onChange={setTertiary} />
+                        <input type="text" onChange={e => setTertiary(e.currentTarget.value)} value={tertiary} className="w-50 px-4 outline-hidden rounded-md bg-primary-100 dark:bg-primary-600 flex py-2 text-black dark:text-primary-100 gap-1 text-center transition-all duration-300" />
+                    </div>}>
+                        {({ onClick, containerRef }) => {
+                            return <div ref={containerRef} onClick={onClick} className="colorwaysSaveAsSwatch" style={{ backgroundColor: tertiary }}>Tertiary</div>;
+                        }}
+                    </StaticContextMenu>
+                </div>
                 {!store ? <>
                     {!offlineColorwayStores.length ? <button
                         className="dc-button dc-button-primary"
@@ -240,7 +251,8 @@ export default function ({
                         </button>
                     </div>}
                     <div className="dc-selector">
-                        {offlineColorwayStores.map(store => <div
+                        {offlineColorwayStores.map((store, i) => <div
+                            key={i}
                             className="dc-colorway"
                             aria-checked={storename === store.name}
                             onClick={() => {
@@ -258,7 +270,7 @@ export default function ({
                     </div>
                 </> : null}
             </div>
-        </div>
-    </Modal>;
+        </Modal>;
+    } else return <AuthenticationRequiredModal modalProps={modalProps} />;
 }
 

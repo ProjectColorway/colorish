@@ -239,6 +239,7 @@ declare global {
     type Context<Key extends ContextKey> = typeof contexts[Key];
     function onOsColorChanged(callback: () => void): void;
     function getSystemColor(): Promise<{ "os-accent-color": string; }>;
+    function authorizeApp(): void;
     const dc_win: {
         minimize(): void;
         focus(): void;
@@ -247,5 +248,6 @@ declare global {
         getWsClients(): WsClient[];
         openWindow(HTML: string): void;
         changeManagerRoleState(boundKey: { [x: number]: string; }, enabled: boolean): void;
+        openExternal(url: string): void;
     };
 }

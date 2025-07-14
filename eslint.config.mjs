@@ -1,12 +1,13 @@
 import stylistic from "@stylistic/eslint-plugin";
 import pathAlias from "eslint-plugin-path-alias";
 import react from "eslint-plugin-react";
+import reactCompiler from "eslint-plugin-react-compiler";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
-import reactCompiler from "eslint-plugin-react-compiler";
 
 export default tseslint.config(
+    reactCompiler.configs.recommended,
     { ignores: ["out"] },
     {
         files: ["src/**/*.{tsx,ts,mts,mjs,js,jsx}", "eslint.config.mjs"],
@@ -15,12 +16,19 @@ export default tseslint.config(
                 version: "18"
             }
         },
+        languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                project: ["./tsconfig.json", "./tsconfig.node.json", "./tsconfig.web.json"],
+                tsconfigRootDir: import.meta.dirname
+            }
+        },
         plugins: {
-            'eslint-plugin-react-compiler': reactCompiler,
+            "eslint-plugin-react-compiler": reactCompiler,
         },
         ...react.configs.flat.recommended,
         rules: {
-            'react-compiler/react-compiler': "error",
+            "react-compiler/react-compiler": "error",
             ...react.configs.flat.recommended.rules,
             "react/react-in-jsx-scope": "off",
             "react/prop-types": "off",
@@ -40,7 +48,10 @@ export default tseslint.config(
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
-                project: ["./tsconfig.json"],
+                projectService: {
+                    allowDefaultProject: ["*.js", "*.ts", "*.tsx", "*.jsx", "*.mts", "*.mjs", "*.cjs"],
+                    defaultProject: "./tsconfig.json",
+                },
                 tsconfigRootDir: import.meta.dirname
             }
         },
@@ -80,10 +91,7 @@ export default tseslint.config(
             "no-duplicate-imports": "error",
             "dot-notation": "error",
             "no-useless-escape": [
-                "error",
-                {
-                    "extra": "i"
-                }
+                "error"
             ],
             "no-fallthrough": "error",
             "for-direction": "error",

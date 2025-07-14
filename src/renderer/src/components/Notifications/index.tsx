@@ -1,7 +1,5 @@
-import { guidGenerator } from "@renderer/api";
-import { createContext, ReactNode, useState } from "react";
-
-const NotificationsContext = createContext<{ [key: string]: ReactNode; }>({});
+import { Dispatcher, Logger, Parsers } from "@renderer/api";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 
 function Notification({ msg, actions, closeNotification }: { msg: string, actions: React.ReactNode, closeNotification(): void; }) {
     return <div className="rounded-xl bg-primary-600 shadow-xl shadow-primary-800 border border-primary-400 flex items-center justify-between w-100 py-2 px-4 gap-4 animate-notification">
@@ -15,47 +13,58 @@ function Notification({ msg, actions, closeNotification }: { msg: string, action
     </div>;
 }
 
-export default function ({ children }: { children({ showNotification }: { showNotification(msg: string, actions?: React.ReactNode): void; }): ReactNode; }) {
+export default function () {
+    const logger = new Logger("NotificationsLayer");
     const [items, setItems] = useState<{ [key: string]: ReactNode; }>({});
-    return <NotificationsContext.Provider value={items}>
-        {children({
-            showNotification(msg: string, actions?: React.ReactNode) {
-                let uuid = guidGenerator();
-                while (Object.keys(items).includes(uuid)) {
-                    uuid = guidGenerator();
-                }
+
+    function closeNotif({ id: iid }: { id?: string; }) {
+        const id = iid || Object.keys(items)[Object.keys(items).length - 1];
+        if (items[id]) {
+            setItems((itms) => {
+                const list = { ...itms };
+                delete list[id];
+                return list;
+            });
+        }
+    }
+
+    function openNotification({ msg, actions }: { msg: string, actions?: React.ReactNode; }) {
+        const id = Parsers.guidGenerator();
+        const node = <Notification closeNotification={() => {
+            setItems((itms) => {
+                const list = { ...itms };
+                delete list[id];
+                return list;
+            });
+        }} msg={msg} actions={actions} key={id} />;
+        setItems((itms) => {
+            return { ...itms, [id]: node };
+        });
+        setTimeout(() => {
+            try {
                 setItems((itms) => {
-                    return {
-                        ...itms,
-                        [uuid]: <Notification closeNotification={() => {
-                            setItems(itms => {
-                                const newItms = {};
-                                Object.keys(itms).filter(key => key !== uuid).map(key => {
-                                    newItms[key] = itms[key];
-                                });
-                                return newItms;
-                            });
-                        }} msg={msg} actions={actions} key={uuid} />
-                    };
+                    const list = { ...itms };
+                    delete list[id];
+                    return list;
                 });
-                setTimeout(() => {
-                    try {
-                        setItems(itms => {
-                            const newItms = {};
-                            Object.keys(itms).filter(key => key !== uuid).map(key => {
-                                newItms[key] = itms[key];
-                            });
-                            return newItms;
-                        });
-                    } catch (e) {
-                        console.warn(e);
-                    }
-                }, 5000);
+            } catch (e) {
+                logger.warn(e);
             }
-        })}
-        <div
-            className="fixed gap-2 top-0 left-0 w-screen h-screen pointer-events-none *:pointer-events-auto z-1000 flex justify-start items-end p-4 flex-col-reverse">
-            {Object.values(items)}
-        </div>
-    </NotificationsContext.Provider>;
+        }, 5000);
+    }
+
+    useEffect(() => {
+        Dispatcher.addListener("OPEN_NOTIFICATION", openNotification);
+        Dispatcher.addListener("CLOSE_NOTIFICATION", closeNotif);
+
+        return () => {
+            Dispatcher.removeListener("OPEN_NOTIFICATION", openNotification);
+            Dispatcher.removeListener("CLOSE_NOTIFICATION", closeNotif);
+        };
+    }, []);
+
+    return <div
+        className="fixed gap-2 top-0 left-0 w-screen h-screen pointer-events-none *:pointer-events-auto z-1000 flex justify-end items-end p-4 flex-col">
+        {Object.values(items).map((it, i) => <Fragment key={i}>{it}</Fragment>)}
+    </div>;
 }
